@@ -1011,6 +1011,7 @@ install_command() {
     database_type="sqlite"
     marzban_version="latest"
     marzban_version_set="false"
+    force_install="false"
 
     # Parse options
     while [[ $# -gt 0 ]]; do
@@ -1038,6 +1039,10 @@ install_command() {
                 marzban_version_set="true"
                 shift 2
             ;;
+            --force)
+                force_install="true"
+                shift
+            ;;
             *)
                 echo "Unknown option: $1"
                 exit 1
@@ -1047,11 +1052,13 @@ install_command() {
 
     # Check if marzban is already installed
     if is_marzban_installed; then
-        colorized_echo red "Marzban is already installed at $APP_DIR"
-        read -p "Do you want to override the previous installation? (y/n) "
-        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-            colorized_echo red "Aborted installation"
-            exit 1
+        if [[ "$force_install" == "false" ]]; then
+            colorized_echo red "Marzban is already installed at $APP_DIR"
+            read -p "Do you want to override the previous installation? (y/n) "
+            if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+                colorized_echo red "Aborted installation"
+                exit 1
+            fi
         fi
     fi
     detect_os
